@@ -6,7 +6,7 @@ from utils import process_location_data
 
 if __name__ == "__main__":
 
-    testproblem = '20170608T122024823843'
+    testproblem = 'my_test'
 
     locations, num_nodes, parcel_weight, delta_T, delta_D = process_location_data(testproblem)
 

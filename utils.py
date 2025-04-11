@@ -20,8 +20,8 @@ def process_location_data(test_instance=None, locations=None, truck_distance=Non
         if test_instance is not None:
 
             # Define folder paths
-            problems_folder = f"mFSTSP_Problems/{test_instance}/tbl_locations.csv"
-            output_distance = f"mFSTSP_Problems/{test_instance}/tbl_truck_travel_data_PG.csv"
+            problems_folder = f"{test_instance}/tbl_locations.csv"
+            output_distance = f"{test_instance}/tbl_truck_travel_data_PG.csv"
 
             # Ensure the output directory exists
             os.makedirs(os.path.dirname(output_distance), exist_ok=True)
