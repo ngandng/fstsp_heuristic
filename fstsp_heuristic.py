@@ -14,13 +14,13 @@ drone_capacity = 5.0
 truck_velocity = 11.2
 truck_service_time = 30
 
-maxIteration = 1000
+maxIteration = 20000
 
 ## END CONFIG
 
 
 
-def fstsp_heuristic(locations, numnodes, parcel_weight, delta_T, delta_D):
+def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     """
     Input: the adjaciency matrix of truck and the adjacency matrix of drone
 
@@ -34,8 +34,8 @@ def fstsp_heuristic(locations, numnodes, parcel_weight, delta_T, delta_D):
 
     [truck_route, time_to_node] = solveTSP(delta_T)
 
-    print("Truck TSP route: ", truck_route)
-    print("TSP route time: ", time_to_node)
+    # print("Truck TSP route: ", truck_route)
+    # print("TSP route time: ", time_to_node)
 
     # partitioning truck route to the subroutes by the nodes of launching and retriving drone
     truck_subroutes = [truck_route]
@@ -86,10 +86,10 @@ def fstsp_heuristic(locations, numnodes, parcel_weight, delta_T, delta_D):
             # perfom_update()
             if serve_by_drone:
                 # the drone is node assigned to i* -> j* -> k*
-                # first remove i* j* k* fomr Cprime
-                Cprime.remove(i_star)
-                Cprime.remove(j_star)
-                Cprime.remove(k_star)
+                # first remove i* j* k* from Cprime
+                if i_star in Cprime: Cprime.remove(i_star)
+                if j_star in Cprime: Cprime.remove(j_star)
+                if k_star in Cprime: Cprime.remove(k_star)
 
                 # Append a drone arc to drone_routes
                 drone_routes.append([i_star, j_star, k_star])
@@ -372,8 +372,8 @@ def calc_cost_uav(node_j, time_to_node, truck_route, subroute, delta_T, delta_D,
                         t_prime_k = t_prime_k - delta_T[preced_j,node_j] - delta_T[node_j,succed_j] + delta_T[preced_j,succed_j] - truck_service_time
                 
                 t_i = time_to_node[truck_route.index(node_i)]
-                cost = max(0, max((t_prime_k-t_i+drone_launch_time+drone_recover_time+drone_service_time),
-                                  (delta_D[node_i,node_j]+delta_D[node_j,node_k]+drone_launch_time+drone_service_time+drone_recover_time))-(t_prime_k-t_i))
+                cost = max(0, max((t_prime_k-t_i+drone_launch_time+drone_recover_time),
+                                  (delta_D[node_i,node_j]+delta_D[node_j,node_k]+drone_launch_time+drone_recover_time))-(t_prime_k-t_i))
                 
                 if (savings - cost) > max_saving:
                     max_saving = savings - cost

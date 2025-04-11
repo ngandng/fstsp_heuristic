@@ -6,6 +6,7 @@ from utils import process_location_data
 
 if __name__ == "__main__":
 
+    # testproblem = '20170608T122024823843'
     testproblem = 'my_test'
 
     locations, num_nodes, parcel_weight, delta_T, delta_D = process_location_data(testproblem)
@@ -19,9 +20,9 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    truck_route, time_array, drone_routes = fstsp_heuristic(locations, num_nodes, parcel_weight, delta_T, delta_D)
+    truck_route, time_array, drone_routes = fstsp_heuristic(num_nodes, parcel_weight, delta_T, delta_D)
 
     end_time = time.time()
 
-    print('COmputation time: ', end_time-start_time)
-    print(f'Solution: \nTruck route: {truck_route}\nTruck time to node: {time_array}\nDrone routes: {drone_routes}')
+    print('Computation time: ', end_time-start_time)
+    print(f'\n\nSolution: \nTruck route: {truck_route}\n\nTruck time to node: {time_array}\n\nDrone routes: {drone_routes}')
