@@ -1,12 +1,12 @@
 # 🛩️ The Flying Sidekick Traveling Salesman Problem (FSTSP)
 
-This repository contains an implementation of a heuristic algorithm described in the paper *[Murray and Chu. "The flying sidekick traveling salesman problem: Optimization of drone-assisted parcel delivery"](https://doi.org/10.1016/j.trc.2015.03.005)*.
+This repository is my implementation of a heuristic algorithm described in the paper *[Murray and Chu. "The flying sidekick traveling salesman problem: Optimization of drone-assisted parcel delivery"](https://doi.org/10.1016/j.trc.2015.03.005)*.
 
 ---
 
 ## 🚀 Overview
 
-In this implementation, I uses Google OR-Tools as the TSP solver.
+In this implementation, I use Google OR-Tools as the TSP solver.
 
 - TSP Solver: [Google OR-Tools](https://developers.google.com/optimization)
 - Routing and Map Data: Based on real-world road networks using OSMnx.
