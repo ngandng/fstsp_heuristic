@@ -146,6 +146,11 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
         else:
             break
 
+    print('\n\ntruck_route: ', truck_route)
+    print('time_to_node: ', time_to_node)
+    print('truck_subroutes: ', truck_subroutes)
+    print('drone_routes: ', drone_routes)
+
     return truck_route, time_to_node, drone_routes
 
 
@@ -356,32 +361,34 @@ def calc_cost_uav(node_j, time_to_node, truck_route, subroute, delta_T, delta_D,
     served_by_drone = None
 
     for i in range(len(subroute)-1):
-        for k in range(i, len(subroute)):
+        for k in range(i+1, len(subroute)):
+
             node_i = subroute[i]
             node_k = subroute[k]
 
             if (delta_D[node_i,node_j] + delta_D[node_j,node_k] + drone_launch_time + drone_recover_time + drone_service_time) < drone_battery:
                 
-                # find t_prime_k, the truck arrival time to node k if j were removed from the truck's route
+                # find t_prime_k, the truck arrival time to node k if j is removed from the truck's route
                 t_prime_k = time_to_node[truck_route.index(node_k)]
 
                 for r in range(truck_route.index(node_k)):
-                    if node_j == truck_route[r]: # the node j is before node k in truck's route
+                    # t_prime_k only change when the removed node_j is before node k in truck's route
+                    if node_j == truck_route[r]: 
                         preced_j = truck_route[r-1]
                         succed_j = truck_route[r+1]
                         t_prime_k = t_prime_k - delta_T[preced_j,node_j] - delta_T[node_j,succed_j] + delta_T[preced_j,succed_j] - truck_service_time
                 
                 t_i = time_to_node[truck_route.index(node_i)]
-                cost = max(0, max((t_prime_k-t_i+drone_launch_time+drone_recover_time),
-                                  (delta_D[node_i,node_j]+delta_D[node_j,node_k]+drone_launch_time+drone_recover_time))-(t_prime_k-t_i))
+
+                drone_travel_time = max((t_prime_k - t_i),(delta_D[node_i,node_j]+delta_D[node_j,node_k])) + drone_launch_time + drone_recover_time    # sychronize time arrives
+                truck_travel_time = t_prime_k - t_i
+                cost = max(0, (drone_travel_time-truck_travel_time))
                 
                 if (savings - cost) > max_saving:
                     max_saving = savings - cost
                     preced_node = node_i
                     succed_node = node_k
                     served_by_drone = True
-    
-    # print(f'In calc_cost_drone() function: max_savings: {max_saving}, i: {preced_node}, j: {node_j}, k: {succed_node}, served_by_drone: {served_by_drone}')
     
     return node_j, preced_node, succed_node, max_saving, served_by_drone
 
