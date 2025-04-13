@@ -15,7 +15,8 @@ def process_location_data(test_instance=None, locations=None, truck_distance=Non
                         travel time matrix delta_T, delta_D
 
             Input       locations, real_distance_matrix, parcel_weight_matrix
-                        OR test_instance name"""
+                        OR test_instance name
+        """
 
         if test_instance is not None:
 
@@ -105,6 +106,8 @@ def point_to_node_distance(lat, lon, node, G):
     node_lat, node_lon = node_data['y'], node_data['x']
     return ox.distance.great_circle(lat, lon, node_lat, node_lon)
 
+
+
 def real_travel_distance(points, G = None):
     num_point = len(points)
     distance_matrix = np.zeros((num_point, num_point))
@@ -176,3 +179,8 @@ def real_travel_distance(points, G = None):
             route_matrix[j, i] = list(reversed(shortest_path))  # Since it's undirected
 
     return route_matrix, distance_matrix  # Convert meters to km
+
+
+def calc_timespan():
+    #TODO: Implement this function
+    pass

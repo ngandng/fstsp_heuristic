@@ -146,10 +146,13 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
         else:
             break
 
-    print('\n\ntruck_route: ', truck_route)
-    print('time_to_node: ', time_to_node)
-    print('truck_subroutes: ', truck_subroutes)
-    print('drone_routes: ', drone_routes)
+    # print('\n\ntruck_route: ', truck_route)
+    # print('time_to_node: ', time_to_node)
+    # print('truck_subroutes: ', truck_subroutes)
+    # print('drone_routes: ', drone_routes)
+
+    # Re-check time array
+    time_to_node = recalc_time(truck_route, drone_routes, delta_T, delta_D)
 
     return truck_route, time_to_node, drone_routes
 
@@ -418,10 +421,10 @@ def recalc_time(truck_route, drone_routes, delta_T, delta_D):
 
         travel_time = delta_T[prev_node,node_j]
 
-        arrival_time = time_to_node[-1] + travel_time
-
         if prev_node != 0:  # add service time of previous node
             travel_time += truck_service_time
+
+        arrival_time = time_to_node[-1] + travel_time
         
         drone_arrival_time = 0
         if node_j in drone_retrie:
