@@ -24,6 +24,8 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     """
     Input: the adjaciency matrix of truck and the adjacency matrix of drone
 
+    Return: truck_route, time_to_node (truck), drone_routes, timespan
+
     """
 
     # set of uav eligible customers
@@ -75,13 +77,6 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
 
         if max_saving > 0:
 
-
-            # print('\n\ntruck_route: ', truck_route)
-            # print('time_to_node: ', time_to_node)
-            # print('truck_subroutes: ', truck_subroutes)
-            # print('drone_routes: ', drone_routes)
-
-            # print(f'\nPerforming an update: \tj_star: {j_star}, i_star: {i_star}, k_star: {k_star}, serve_by_drone: {serve_by_drone}')
 
             # perfom_update()
             if serve_by_drone:
@@ -146,15 +141,28 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
         else:
             break
 
-    # print('\n\ntruck_route: ', truck_route)
-    # print('time_to_node: ', time_to_node)
-    # print('truck_subroutes: ', truck_subroutes)
-    # print('drone_routes: ', drone_routes)
-
     # Re-check time array
     time_to_node = recalc_time(truck_route, drone_routes, delta_T, delta_D)
 
-    return truck_route, time_to_node, drone_routes
+    # Calculating timespan
+    timespan = time_to_node[-1]
+
+    for drone_arc in drone_routes:
+            if drone_arc[2] == 0:   # drone going back to depot itself
+                launching_time = time_to_node[truck_route.index(drone_arc[0])]
+
+                return_time = (launching_time +
+                               drone_launch_time + 
+                               delta_D[drone_arc[0], drone_arc[1]] +
+                               drone_service_time +
+                               delta_D[drone_arc[1], drone_arc[2]] +
+                               drone_recover_time)
+                
+                if time_to_node[-1] < return_time:   # drone go back to depot after the truck
+                    timespan = return_time
+
+
+    return truck_route, time_to_node, drone_routes, timespan
 
 
 def get_uav_eligible_cus(parcel_weight):
