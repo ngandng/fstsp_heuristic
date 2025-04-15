@@ -2,8 +2,8 @@
 import time
 import argparse
 
-from fstsp_heuristic import fstsp_heuristic
-from cp_aco import cp_aco
+from algorithms.fstsp_heuristic import fstsp_heuristic
+from algorithms.cp_aco import cp_aco
 from utils import process_location_data
 
 if __name__ == "__main__":

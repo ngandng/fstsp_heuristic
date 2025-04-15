@@ -6,7 +6,7 @@ import pandas as pd
 import networkx as nx
 import osmnx as ox
 
-from fstsp_heuristic import truck_velocity, drone_velocity
+from algorithms.fstsp_heuristic import truck_velocity, drone_velocity
 
 def process_location_data(test_instance=None, locations=None, truck_distance=None, parcel_w=None):
         """ Return      locations
