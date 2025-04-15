@@ -9,7 +9,6 @@ This repository is my implementation of several heuristic algorithms solving the
 - CP-ACO implemented based on the proposed heuristic on *[D. N. Das, R. Sewani, J. Wang and M. K. Tiwari, "Synchronized Truck and Drone Routing in Package Delivery Logistics," in IEEE Transactions on Intelligent Transportation Systems. 2021](https://doi.org/10.1109/TITS.2020.2992549)*
 
 - Comming soon...
----
 
 ## 🧪 How to Run
 
@@ -21,14 +20,12 @@ python3 main.py --test_instance="test_folder_name"
 
 - Algorithm parameters can be adjusted in the `algorithm_name.py` file.
 
----
 
 ## 🧾 Test Cases
 
 - Test datasets are adapted from [https://github.com/optimatorlab/mFSTSP](https://github.com/optimatorlab/mFSTSP/tree/master/Problems).
 - You may also run the algorithm with a custom list of latitude, longitude, and parcel weight inputs. Refer to the folder `my_test` for example.
 
----
 
 ## 📦 Requirements
 
@@ -38,8 +35,6 @@ python3 main.py --test_instance="test_folder_name"
 - `numpy`
 - `pandas`
 - `ortools`
-
----
 
 ## 👩‍💻 Author
 Thi Thuy Ngan Duong
