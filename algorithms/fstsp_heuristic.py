@@ -18,6 +18,14 @@ maxIteration = 20000
 
 ## END CONFIG
 
+class Truck_Subroutes:
+    def __init__(self, subroute):
+        self.route = subroute
+        self.drone_route = None     # the drone route working parallel with this truck subroute
+
+    def assign_drone_route(self, drone_route):
+        self.drone_route = drone_route
+
 
 
 def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
@@ -27,20 +35,20 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     Return: truck_route, time_to_node (truck), drone_routes, timespan
 
     """
-
-    # set of uav eligible customers
-    Cprime = get_uav_eligible_cus(parcel_weight)
     
     # set of all customers
     C = list(range(0, numnodes))
 
     [truck_route, time_to_node] = solveTSP(delta_T)
 
-    # print("Truck TSP route: ", truck_route)
-    # print("TSP route time: ", time_to_node)
+    # set of uav eligible customers
+    Cprime = get_uav_eligible_cus(truck_route, parcel_weight)
+
+    # print("Initial truck TSP route: ", truck_route)
+    # print("Initial Cprime: ", Cprime)
 
     # partitioning truck route to the subroutes by the nodes of launching and retriving drone
-    truck_subroutes = [truck_route]
+    truck_subroutes = [Truck_Subroutes(truck_route)]
 
     # drone route is set of travel arc = (launching node, delivery node, retrieve node)
     drone_routes = []
@@ -49,7 +57,7 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
 
     for _ in range(maxIteration):
 
-        # for the perform update function
+        # for perform the update function
         serve_by_drone = None         # False means serve by truck, True means serve by drone
         i_star = None
         k_star = None
@@ -59,13 +67,13 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
             savings = calc_savings(j, delta_T, delta_D, time_to_node, truck_route, drone_routes)
 
             for subroute in truck_subroutes:
-                if is_uav_in_subroute(subroute, drone_routes):
+                if is_uav_in_subroute(subroute):
                     # calculating the cost of inserting node j to truck route
-                    new_j_star, new_i_star, new_k_star, new_max_saving, new_serve_by_drone = calc_cost_truck(j, time_to_node, truck_route, subroute, delta_T, savings, max_saving)
+                    new_j_star, new_i_star, new_k_star, new_max_saving, new_serve_by_drone = calc_cost_truck(j, time_to_node, truck_route, subroute.route, delta_T, savings, max_saving)
 
                 else:
                     # calculating the cost of inserting node j to drone operation
-                    new_j_star, new_i_star, new_k_star, new_max_saving, new_serve_by_drone = calc_cost_uav(j, time_to_node, truck_route, subroute, delta_T, delta_D, savings, max_saving)
+                    new_j_star, new_i_star, new_k_star, new_max_saving, new_serve_by_drone = calc_cost_uav(j, time_to_node, truck_route, subroute.route, delta_T, delta_D, savings, max_saving)
                 
                 # update max_saving
                 if new_max_saving > max_saving:
@@ -76,7 +84,7 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
                     serve_by_drone = new_serve_by_drone
 
         if max_saving > 0:
-
+            # print(f"Updating with: i_star: {i_star}, j_star: {j_star}, k_star: {k_star}, serve_by_drone: {serve_by_drone}, max_saving: {max_saving}")
 
             # perfom_update()
             if serve_by_drone:
@@ -94,24 +102,26 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
                 truck_route.remove(j_star)
 
                 for subroute in truck_subroutes:
-                    if j_star in subroute:
-                        subroute.remove(j_star)
+                    if j_star in subroute.route:
+                        subroute.route.remove(j_star)
 
                 # Append a new truck subroute that start from i* and ends at k*
                 for subroute in truck_subroutes[:]:  # iterate over a shallow copy
-                    if i_star in subroute and k_star in subroute:
-                        i = subroute.index(i_star)
-                        k = subroute.index(k_star)
+                    if i_star in subroute.route and k_star in subroute.route:
+                        i = subroute.route.index(i_star)
+                        k = subroute.route.index(k_star)
 
                         # Ensure i comes before k
                         if i <= k:
-                            subroute1 = subroute[:i+1]
-                            subroute2 = subroute[i:k+1]
-                            subroute3 = subroute[k:]
+                            subroute1 = Truck_Subroutes(subroute.route[:i+1])
+                            subroute2 = Truck_Subroutes(subroute.route[i:k+1])
+                            subroute3 = Truck_Subroutes(subroute.route[k:])
 
-                            if len(subroute1)>1: truck_subroutes.append(subroute1)
-                            if len(subroute2)>1: truck_subroutes.append(subroute2)
-                            if len(subroute3)>1: truck_subroutes.append(subroute3)
+                            subroute2.assign_drone_route([i_star, j_star, k_star])
+
+                            if len(subroute1.route)>1: truck_subroutes.append(subroute1)
+                            if len(subroute2.route)>1: truck_subroutes.append(subroute2)
+                            if len(subroute3.route)>1: truck_subroutes.append(subroute3)
 
                             truck_subroutes.remove(subroute)
 
@@ -121,11 +131,11 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
 
                 # Update truck_subroutes
                 for subroute in truck_subroutes:
-                    if j_star in subroute:
-                        subroute.remove(j_star)
+                    if j_star in subroute.route:
+                        subroute.route.remove(j_star)
                     if i_star in subroute:
-                        i = subroute.index(i_star)
-                        subroute.insert(i+1, j_star)
+                        i = subroute.route.index(i_star)
+                        subroute.route.insert(i+1, j_star)
 
                 # update truck route
                 truck_route.remove(j_star)
@@ -161,15 +171,14 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
                 if time_to_node[-1] < return_time:   # drone go back to depot after the truck
                     timespan = return_time
 
-
     return truck_route, time_to_node, drone_routes, timespan
 
 
-def get_uav_eligible_cus(parcel_weight):
+def get_uav_eligible_cus(truck_route, parcel_weight):
     Cprime = []
 
-    for i in range(len(parcel_weight)):
-        if parcel_weight[i] <= drone_capacity:
+    for i in truck_route:
+        if parcel_weight[i] <= drone_capacity and parcel_weight[i] > 0:
             Cprime.append(i)
     
     return Cprime
@@ -279,7 +288,7 @@ def calc_savings(node_j, delta_T, delta_D, time_array, truck_route, drone_routes
             preceding_node = truck_route[idx-1]
             successor_node = truck_route[idx+1]
 
-            savings = delta_T[preceding_node,node_j] + delta_T[node_j, successor_node] - delta_T[preceding_node,successor_node]
+            savings = delta_T[preceding_node,node_j] + delta_T[node_j, successor_node] - delta_T[preceding_node,successor_node] - truck_service_time
 
             # check if node j is currently in a truck subroute paired with the UAV
             prev_j = truck_route[:idx]
@@ -293,16 +302,19 @@ def calc_savings(node_j, delta_T, delta_D, time_array, truck_route, drone_routes
                 if a in prev_j and b in afte_j:
                     # calculate the t_prime[b] the time truck arrive to b if j is removed from the truck node
                     pos_b = truck_route.index(b)
-                    t_prime_b = time_array[pos_b] - savings - truck_service_time
+                    t_prime_b = time_array[pos_b] - savings
 
                     t_a = time_array[truck_route.index(a)]
+
+                    drone_a_to_b = t_a + delta_D[a,drone_cust] + delta_D[drone_cust,b] + drone_recover_time + drone_launch_time + drone_service_time
+
                     # new saving value
-                    savings = min(savings, (t_prime_b - (t_a + delta_D[a,drone_cust] + delta_D[drone_cust,b] + drone_recover_time + drone_launch_time + drone_service_time)))
+                    savings = min(savings, (t_prime_b - drone_a_to_b))
 
     return savings
 
 
-def is_uav_in_subroute(subroute, drone_routes):
+def is_uav_in_subroute(subroute):
 
     """ Check whether a drone working parallel with the truck in this subtour
         
@@ -311,13 +323,16 @@ def is_uav_in_subroute(subroute, drone_routes):
 
     result = False
 
-    for drone_arc in drone_routes:
-        a = drone_arc[0]
-        cust = drone_arc[1]
-        b = drone_arc[2]
+    # for drone_arc in drone_routes:
+    #     a = drone_arc[0]
+    #     cust = drone_arc[1]
+    #     b = drone_arc[2]
 
-        if a in subroute and b in subroute:
-            result = True
+    #     if a in subroute and b in subroute:
+    #         result = True
+
+    if subroute.drone_route is not None:
+        result = True
 
     return result
 
@@ -341,6 +356,9 @@ def calc_cost_truck(node_j, time_to_node, truck_route, subroute, delta_T, saving
     for i in range(len(subroute)-1):
         node1 = subroute[i]
         node2 = subroute[i+1]
+
+        if node1 == node_j or node2 == node_j:
+            continue
 
         # try to insert node_j to between i and i+1
         cost = delta_T[node1, node_j] + delta_T[node_j, node2] - delta_T[node1, node2]
@@ -391,7 +409,7 @@ def calc_cost_uav(node_j, time_to_node, truck_route, subroute, delta_T, delta_D,
                 
                 t_i = time_to_node[truck_route.index(node_i)]
 
-                drone_travel_time = max((t_prime_k - t_i),(delta_D[node_i,node_j]+delta_D[node_j,node_k])) + drone_launch_time + drone_recover_time    # sychronize time arrives
+                drone_travel_time = max((t_prime_k - t_i),(delta_D[node_i,node_j]+delta_D[node_j,node_k]+drone_launch_time+drone_recover_time+drone_service_time))    # sychronize time arrives
                 truck_travel_time = t_prime_k - t_i
                 cost = max(0, (drone_travel_time-truck_travel_time))
                 
