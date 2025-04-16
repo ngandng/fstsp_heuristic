@@ -13,8 +13,9 @@ This repository is my implementation of several heuristic algorithms solving the
 ## 🧪 How to Run
 
 ```bash
-python3 main.py --test_instance="test_folder_name"
+python3 main.py --algorithm="algorithm_name" --test_instance="test_folder_name"
 ```
+where `algorithm_name` can be either 'fstsp_heuristic' or 'cp_aco'
 
 ### 🔧 Configuration
 

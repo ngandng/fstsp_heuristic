@@ -107,6 +107,8 @@ def cp_aco(numnodes, parcel_weight, delta_T, delta_D):
     # Elite Archive
     elite_archive = []
 
+    print('CP-ACO calculating ...')
+
     # Main loop
     for iter in range(maxIteration):
         for ant in range(num_ant):
@@ -247,7 +249,7 @@ def cp_aco(numnodes, parcel_weight, delta_T, delta_D):
         # ]
 
         # Print at each iteration
-        print(f'Iteration {iter}: Length of Elite Archive: {len(elite_archive)} \t Sampled solution: {random.choice(elite_archive).fitness}')
+        # print(f'Iteration {iter}: Length of Elite Archive: {len(elite_archive)} \t Sampled solution: {random.choice(elite_archive).fitness}')
 
     sampled_solution = random.choice(elite_archive)
     returned_truck_route = sampled_solution.truck_route

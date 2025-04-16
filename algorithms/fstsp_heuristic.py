@@ -44,7 +44,6 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     # set of uav eligible customers
     Cprime = get_uav_eligible_cus(truck_route, parcel_weight)
 
-    # print("Initial truck TSP route: ", truck_route)
     # print("Initial Cprime: ", Cprime)
 
     # partitioning truck route to the subroutes by the nodes of launching and retriving drone
@@ -52,6 +51,9 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
 
     # drone route is set of travel arc = (launching node, delivery node, retrieve node)
     drone_routes = []
+
+    time_to_node = recalc_time(truck_route, drone_routes, delta_T, delta_D)
+    # print("Initial truck TSP route: ", truck_route, "\t Timespan: ",time_to_node[-1])
 
     max_saving = 0
 
@@ -394,6 +396,9 @@ def calc_cost_uav(node_j, time_to_node, truck_route, subroute, delta_T, delta_D,
 
             node_i = subroute[i]
             node_k = subroute[k]
+
+            if node_i == node_j or node_k == node_j:
+                continue
 
             if (delta_D[node_i,node_j] + delta_D[node_j,node_k] + drone_launch_time + drone_recover_time + drone_service_time) < drone_battery:
                 

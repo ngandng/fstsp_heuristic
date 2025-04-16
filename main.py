@@ -9,8 +9,11 @@ from utils import process_location_data
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Run FSTSP Heuristic Algorithm")
-    parser.add_argument('--test_instance', type=str, default='20170608T122008595748',
+    parser.add_argument('--test_instance', type=str, default='my_test',
                         help='Path to the test instance file')
+    
+    parser.add_argument('--algorithm', type=str, default='fstsp_heuristic',
+                        help='Type of algorithm')
 
     args = parser.parse_args()
 
@@ -27,8 +30,10 @@ if __name__ == "__main__":
 
     start_time = time.time()
 
-    truck_route, time_array, drone_routes, timespan = fstsp_heuristic(num_nodes, parcel_weight, delta_T, delta_D)
-    # truck_route, time_array, drone_routes, timespan = cp_aco(num_nodes, parcel_weight, delta_T, delta_D)
+    if args.algorithm == 'fstsp_heuristic':
+        truck_route, time_array, drone_routes, timespan = fstsp_heuristic(num_nodes, parcel_weight, delta_T, delta_D)
+    elif args.algorithm == 'cp_aco':
+        truck_route, time_array, drone_routes, timespan = cp_aco(num_nodes, parcel_weight, delta_T, delta_D)
 
     end_time = time.time()
 
