@@ -27,6 +27,20 @@ where `algorithm_name` can be either 'fstsp_heuristic' or 'cp_aco'
 - Test datasets are adapted from [https://github.com/optimatorlab/mFSTSP](https://github.com/optimatorlab/mFSTSP/tree/master/Problems).
 - You may also run the algorithm with a custom list of latitude, longitude, and parcel weight inputs. Refer to the folder `my_test` for example.
 
+## Results
+<table>
+  <tr>
+    <td align="center">
+      <img src="cp_aco_25cus.png" width="250"/><br>
+      <em>Figure 1: Results of CP-ACO in 25 customers test</em>
+    </td>
+    <td align="center">
+      <img src="fstsp_heuristic_25cus.png" width="250"/><br>
+      <em>Figure 2: Results of FSTSP_heuristic in 25 customers test</em>
+    </td>
+  </tr>
+</table>
+
 
 ## 📦 Requirements
 

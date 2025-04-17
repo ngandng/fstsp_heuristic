@@ -5,6 +5,7 @@ import argparse
 from algorithms.fstsp_heuristic import fstsp_heuristic
 from algorithms.cp_aco import cp_aco
 from utils import process_location_data
+# from plot import plot_map
 
 if __name__ == "__main__":
 
@@ -21,12 +22,12 @@ if __name__ == "__main__":
 
     locations, num_nodes, parcel_weight, delta_T, delta_D = process_location_data(testproblem)
 
-    # test
-    print('locations: ', locations)
-    print('num_nodes: ', num_nodes)
-    print('parcel_weight: ', parcel_weight)
-    print('\ndelta_T: ', delta_T, '\n')
-    print('delta_D: ', delta_D, '\n')
+    # Print the input
+    # print('locations: ', locations)
+    # print('num_nodes: ', num_nodes)
+    # print('parcel_weight: ', parcel_weight)
+    # print('\ndelta_T: ', delta_T, '\n')
+    # print('delta_D: ', delta_D, '\n')
 
     start_time = time.time()
 
@@ -40,3 +41,6 @@ if __name__ == "__main__":
     print('\n\nComputation time: ', end_time-start_time)
     print(f'\n\nSolution: \nTruck route: {truck_route}\n\nTruck time to node: {time_array}\n\nDrone routes: {drone_routes} \n\nTimespan: {timespan}')
     print(f'\n\nNumber of drone customer: {len(drone_routes)} \nNumber of truck customer: {len(truck_route)-2}')
+
+    # Plot
+    # plot_map(locations, truck_route, drone_routes)
