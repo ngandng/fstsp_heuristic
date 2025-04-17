@@ -31,11 +31,11 @@ where `algorithm_name` can be either 'fstsp_heuristic' or 'cp_aco'
 <table>
   <tr>
     <td align="center">
-      <img src="cp_aco_25cus.png" width="250"/><br>
+      <img src="imgs/cp_aco_25cus.png" width="250"/><br>
       <em>Figure 1: Results of CP-ACO in 25 customers test</em>
     </td>
     <td align="center">
-      <img src="fstsp_heuristic_25cus.png" width="250"/><br>
+      <img src="imgs/fstsp_heuristic_25cus.png" width="250"/><br>
       <em>Figure 2: Results of FSTSP_heuristic in 25 customers test</em>
     </td>
   </tr>
