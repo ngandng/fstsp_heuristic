@@ -18,7 +18,7 @@ drone_capacity = 5.0
 truck_velocity = 11.2
 truck_service_time = 30
 
-maxIteration = 2000
+maxIteration = 20000
 
 # ACO hyperparameters
 num_ant = 10
@@ -196,6 +196,10 @@ def cp_aco(numnodes, parcel_weight, delta_T, delta_D):
                     
                     # convert to the probs
                     p_ijk = np.array(p_ijk)
+
+                    if sum(p_ijk) == 0:
+                        continue
+                    
                     p_ijk = p_ijk / sum(p_ijk)
 
                     # choose the tour
@@ -251,11 +255,13 @@ def cp_aco(numnodes, parcel_weight, delta_T, delta_D):
         # Print at each iteration
         # print(f'Iteration {iter}: Length of Elite Archive: {len(elite_archive)} \t Sampled solution: {random.choice(elite_archive).fitness}')
 
-    sampled_solution = random.choice(elite_archive)
-    returned_truck_route = sampled_solution.truck_route
-    returned_truck_time = sampled_solution.truck_time
-    returned_drone_route = sampled_solution.drone_routes
-    return_timespan = sampled_solution.fitness
+    best_solution = min(elite_archive, key=lambda sol: sol.fitness)
+
+    returned_truck_route = best_solution.truck_route
+    returned_truck_time = best_solution.truck_time
+    returned_drone_route = best_solution.drone_routes
+    return_timespan = best_solution.fitness
+
 
     return returned_truck_route, returned_truck_time, returned_drone_route, return_timespan
                 

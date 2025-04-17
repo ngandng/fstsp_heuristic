@@ -5,7 +5,7 @@ import argparse
 from algorithms.fstsp_heuristic import fstsp_heuristic
 from algorithms.cp_aco import cp_aco
 from utils import process_location_data
-# from plot import plot_map
+from plot import plot_map
 
 if __name__ == "__main__":
 
@@ -43,4 +43,4 @@ if __name__ == "__main__":
     print(f'\n\nNumber of drone customer: {len(drone_routes)} \nNumber of truck customer: {len(truck_route)-2}')
 
     # Plot
-    # plot_map(locations, truck_route, drone_routes)
+    plot_map(locations, truck_route, drone_routes)
