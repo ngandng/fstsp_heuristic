@@ -6,13 +6,13 @@ from ortools.constraint_solver import pywrapcp
 ### CONFIG:
 drone_velocity = 31.3
 drone_battery = 1800
-drone_launch_time = 60
-drone_recover_time = 30
-drone_service_time = 60
+drone_launch_time = 0
+drone_recover_time = 0
+drone_service_time = 10
 drone_capacity = 5.0
 
 truck_velocity = 11.2
-truck_service_time = 30
+truck_service_time = 5
 
 maxIteration = 20000
 
@@ -42,7 +42,7 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     [truck_route, time_to_node] = solveTSP(delta_T)
 
     # set of uav eligible customers
-    Cprime = get_uav_eligible_cus(truck_route, parcel_weight)
+    Cprime = get_uav_eligible_cus(parcel_weight)
 
     # print("Initial Cprime: ", Cprime)
 
@@ -132,10 +132,11 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
             else: # serve by truck
 
                 # Update truck_subroutes
-                for subroute in truck_subroutes:
+                for idx in range(len(truck_subroutes)):
+                    subroute = truck_subroutes[idx]
                     if j_star in subroute.route:
                         subroute.route.remove(j_star)
-                    if i_star in subroute:
+                    if i_star in subroute.route:
                         i = subroute.route.index(i_star)
                         subroute.route.insert(i+1, j_star)
 
@@ -176,10 +177,10 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     return truck_route, time_to_node, drone_routes, timespan
 
 
-def get_uav_eligible_cus(truck_route, parcel_weight):
+def get_uav_eligible_cus(parcel_weight):
     Cprime = []
 
-    for i in truck_route:
+    for i in range(len(parcel_weight)):
         if parcel_weight[i] <= drone_capacity and parcel_weight[i] > 0:
             Cprime.append(i)
     

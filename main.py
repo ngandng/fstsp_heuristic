@@ -4,6 +4,9 @@ import argparse
 
 from algorithms.fstsp_heuristic import fstsp_heuristic
 from algorithms.cp_aco import cp_aco
+from algorithms.tsp import solveTSP
+
+
 from utils import process_location_data
 # from plot import plot_map
 
@@ -35,6 +38,9 @@ if __name__ == "__main__":
         truck_route, time_array, drone_routes, timespan = fstsp_heuristic(num_nodes, parcel_weight, delta_T, delta_D)
     elif args.algorithm == 'cp_aco':
         truck_route, time_array, drone_routes, timespan = cp_aco(num_nodes, parcel_weight, delta_T, delta_D)
+    elif args.algorithm == 'tsp':
+        truck_route, time_array, timespan = solveTSP(delta_T)
+        drone_routes = []
 
     end_time = time.time()
 

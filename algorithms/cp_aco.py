@@ -10,13 +10,13 @@ import random
 ### CONFIG:
 drone_velocity = 31.3
 drone_battery = 1800
-drone_launch_time = 60
-drone_recover_time = 30
-drone_service_time = 60
+drone_launch_time = 0
+drone_recover_time = 0
+drone_service_time = 10
 drone_capacity = 5.0
 
 truck_velocity = 11.2
-truck_service_time = 30
+truck_service_time = 5
 
 maxIteration = 20000
 
@@ -199,7 +199,7 @@ def cp_aco(numnodes, parcel_weight, delta_T, delta_D):
 
                     if sum(p_ijk) == 0:
                         continue
-                    
+
                     p_ijk = p_ijk / sum(p_ijk)
 
                     # choose the tour
