@@ -4,7 +4,9 @@ This repository is my implementation of several heuristic algorithms solving the
 
 - FSTSP_heuristic described in the paper *[Murray and Chu. "The flying sidekick traveling salesman problem: Optimization of drone-assisted parcel delivery", in Transportation Research Part C: Emerging Technologies. 2015](https://doi.org/10.1016/j.trc.2015.03.005)*.
 
-    - In this implementation, I use [Google OR-Tools](https://developers.google.com/optimization) as the TSP solver. 
+    - TSP solvers used for FSTSP heuristic has two options:
+      - [Google OR-Tools](https://developers.google.com/optimization)
+      - Two-opt heuristic
 
 - CP-ACO implemented based on the proposed heuristic on *[D. N. Das, R. Sewani, J. Wang and M. K. Tiwari, "Synchronized Truck and Drone Routing in Package Delivery Logistics," in IEEE Transactions on Intelligent Transportation Systems. 2021](https://doi.org/10.1109/TITS.2020.2992549)*
 
