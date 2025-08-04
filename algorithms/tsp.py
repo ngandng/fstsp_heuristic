@@ -2,16 +2,18 @@
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
-### CONFIG:
-drone_velocity = 31.3
-drone_battery = 1800
-drone_launch_time = 0
-drone_recover_time = 0
-drone_service_time = 10
-drone_capacity = 5.0
+from config import config
 
-truck_velocity = 11.2
-truck_service_time = 5
+### CONFIG:
+drone_velocity = config['drone_velocity']
+drone_battery = config['drone_battery']
+drone_launch_time = config['drone_launch_time']
+drone_recover_time = config['drone_recover_time']
+drone_service_time = config['drone_service_time']
+drone_capacity = config['drone_capacity']
+
+truck_velocity = config['truck_velocity']
+truck_service_time = config['truck_service_time']
 
 maxIteration = 20000
 
@@ -122,7 +124,7 @@ def solveTSP(distance_matrix):
             travel_time += truck_service_time
 
         arrival_time = returned_time[-1] + travel_time
-        returned_time.append(float(arrival_time))
+        returned_time.append(round(float(arrival_time), 2))
 
     timespan = returned_time[-1]
 

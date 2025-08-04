@@ -2,19 +2,20 @@
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
+from config import config
 
 ### CONFIG:
-drone_velocity = 31.3
-drone_battery = 1800
-drone_launch_time = 0
-drone_recover_time = 0
-drone_service_time = 10
-drone_capacity = 5.0
+drone_velocity = config['drone_velocity']
+drone_battery = config['drone_battery']
+drone_launch_time = config['drone_launch_time']
+drone_recover_time = config['drone_recover_time']
+drone_service_time = config['drone_service_time']
+drone_capacity = config['drone_capacity']
 
-truck_velocity = 11.2
-truck_service_time = 5
+truck_velocity = config['truck_velocity']
+truck_service_time = config['truck_service_time']
 
-maxIteration = 20000
+maxIteration = 200000
 
 ## END CONFIG
 
@@ -28,7 +29,7 @@ class Truck_Subroutes:
 
 
 
-def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
+def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D, tsp_solver='ortools'):
     """
     Input: the adjaciency matrix of truck and the adjacency matrix of drone
 
@@ -39,7 +40,14 @@ def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D):
     # set of all customers
     C = list(range(0, numnodes))
 
-    [truck_route, time_to_node] = solveTSP(delta_T)
+    if tsp_solver == 'ortools':
+        [truck_route, time_to_node] = solveTSP(delta_T)
+    elif tsp_solver == 'twoopt':
+        truck_route, time_to_node = two_opt(delta_T)
+    else:
+        raise ValueError("FSTSP_heuristic: Invalid choose for tsp solver!")
+
+    # print("Initial tsp route: ", truck_route)
 
     # set of uav eligible customers
     Cprime = get_uav_eligible_cus(parcel_weight)
@@ -185,6 +193,40 @@ def get_uav_eligible_cus(parcel_weight):
             Cprime.append(i)
     
     return Cprime
+
+def calculate_route_distance(route, dist_matrix):
+    return sum(dist_matrix[route[i], route[i + 1]] for i in range(len(route) - 1)) + dist_matrix[route[-1], route[0]]
+
+def compute_time_to_each_node(route, dist_matrix):
+    time_to_node = [0]  # starting at node 0, time = 0
+    current_time = 0
+    for i in range(1, len(route)):
+        current_time += dist_matrix[route[i - 1], route[i]]
+        time_to_node.append(current_time)
+    return time_to_node
+
+def two_opt(dist_matrix, max_iter=500):
+    n = len(dist_matrix)
+    route = list(range(n))  # initial route: [0, 1, ..., n-1]
+    route.append(0)
+    best_distance = calculate_route_distance(route, dist_matrix)
+
+    for _ in range(max_iter):
+        improved = False
+        for i in range(1, n - 2):
+            for j in range(i + 1, n):
+                if j - i == 1: continue
+                new_route = route[:i] + route[i:j][::-1] + route[j:]
+                new_distance = calculate_route_distance(new_route, dist_matrix)
+                if new_distance < best_distance:
+                    route = new_route
+                    best_distance = new_distance
+                    improved = True
+        if not improved:
+            break
+
+    time_to_node = compute_time_to_each_node(route, dist_matrix)
+    return route, time_to_node
 
 def solveTSP(distance_matrix):
 
@@ -473,7 +515,7 @@ def recalc_time(truck_route, drone_routes, delta_T, delta_D):
             )
 
         arrival_time = max(arrival_time, drone_arrival_time)
-        time_to_node.append(float(arrival_time))
+        time_to_node.append(round(float(arrival_time), 2))
 
     return time_to_node
 

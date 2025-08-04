@@ -7,16 +7,18 @@
 import numpy as np
 import random
 
-### CONFIG:
-drone_velocity = 31.3
-drone_battery = 1800
-drone_launch_time = 0
-drone_recover_time = 0
-drone_service_time = 10
-drone_capacity = 5.0
+from config import config
 
-truck_velocity = 11.2
-truck_service_time = 5
+### CONFIG:
+drone_velocity = config['drone_velocity']
+drone_battery = config['drone_battery']
+drone_launch_time = config['drone_launch_time']
+drone_recover_time = config['drone_recover_time']
+drone_service_time = config['drone_service_time']
+drone_capacity = config['drone_capacity']
+
+truck_velocity = config['truck_velocity']
+truck_service_time = config['truck_service_time']
 
 maxIteration = 20000
 
@@ -409,7 +411,7 @@ def recalc_time(truck_route, drone_routes, delta_T, delta_D):
             )
 
         arrival_time = max(arrival_time, drone_arrival_time)
-        time_to_node.append(float(arrival_time))
+        time_to_node.append(round(float(arrival_time), 2))
 
     return time_to_node
 
