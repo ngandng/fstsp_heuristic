@@ -28,7 +28,7 @@ class Truck_Subroutes:
         self.drone_route = drone_route
 
 
-
+# Main algorithm
 def fstsp_heuristic(numnodes, parcel_weight, delta_T, delta_D, tsp_solver='ortools'):
     """
     Input: the adjaciency matrix of truck and the adjacency matrix of drone

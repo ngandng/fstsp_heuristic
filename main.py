@@ -31,25 +31,25 @@ if __name__ == "__main__":
     ep_time = []
     results = {}
 
-    will_save = True
+    will_save = False
 
     # ===> TEST WITH PARSE INSTANCE
-    testproblem = args.test_instance
-    total_test_episodes = 1
+    # testproblem = args.test_instance
+    # total_test_episodes = 1
 
     # ===> TEST WITH A FOLDER
     # city_name = 'Incheon_small'
     # city_name = 'Incheon_big'
-    # city_name = "Ulsan_Namgu"
-    # num_nodes = 101
-    # folder_name = 'data/testing/' + str(city_name) +'/' + str(num_nodes) + '/'
-    # problem_names = [f.name for f in os.scandir(folder_name) if f.is_dir()]
+    city_name = "Ulsan_Namgu"
+    num_nodes = 101
+    folder_name = 'data/new_test/' + str(city_name) +'/' + str(num_nodes) + '/'
+    problem_names = [f.name for f in os.scandir(folder_name) if f.is_dir()]
 
-    # problem_name = folder_name + problem_names[0]
-    # total_test_episodes = min(len(problem_names), 100)
+    problem_name = folder_name + problem_names[0]
+    total_test_episodes = min(len(problem_names), 1000)
 
     for ep in range(total_test_episodes):
-        # testproblem = folder_name + problem_names[ep]
+        testproblem = folder_name + problem_names[ep]
 
         locations, num_nodes, parcel_weight, delta_T, delta_D = process_location_data(testproblem)
 
@@ -60,10 +60,12 @@ if __name__ == "__main__":
         # print('\ndelta_T: ', delta_T, '\n')
         # print('delta_D: ', delta_D, '\n')
 
+        tsp_solver = 'ortools' # or twoopt
+
         start_time = time.time()
 
         if args.algorithm == 'fstsp_heuristic':
-            truck_route, time_array, drone_routes, timespan = fstsp_heuristic(num_nodes, parcel_weight, delta_T, delta_D, tsp_solver='twoopt')
+            truck_route, time_array, drone_routes, timespan = fstsp_heuristic(num_nodes, parcel_weight, delta_T, delta_D, tsp_solver=tsp_solver)
         elif args.algorithm == 'cp_aco':
             truck_route, time_array, drone_routes, timespan = cp_aco(num_nodes, parcel_weight, delta_T, delta_D)
         elif args.algorithm == 'tsp':
