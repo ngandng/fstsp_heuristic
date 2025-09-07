@@ -4,7 +4,9 @@
                 Networks (2018).
 """
 
+import math
 import itertools
+from collections import defaultdict
 # from config import config
 
 # ### CONFIG:
@@ -39,7 +41,7 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
 
     all_sets = []
     for s in range(2, n + 1):
-        for subset in itertools.combinations(range(n), s):
+        for subset in itertools.combinations(range(n), s):  # all possible subsets of size i from the set range(n)
             sset = frozenset(subset)
             all_sets.append(sset)
     all_nodes = frozenset(range(n))
@@ -80,7 +82,7 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
                     D_T[(S, v, w)] = best_cost
                     P[(S, v, w)] = best_prev
 
-    print('\nD: ', D_T)
+    print('\nD_T: ', D_T)
     print('\nP: ', P)
 
 
@@ -107,14 +109,38 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
 
     ### THIRD PASS
     v_0 = 0     # defining depot
-    D = {}
-    D[(None, v_0)] = 0
-    
-    for U in all_sets:
-        V = all_nodes - subset
-        for r in range(1, len(V) + 1):   # size of subset
-            for T in itertools.combinations(V, r):
+    D = defaultdict(lambda: math.inf)
 
+    # base case
+    D[(frozenset(), v_0)] = 0   # base case
+    for (u,) in itertools.combinations(all_nodes, 1):
+        D[(frozenset([u]), u)] = delta_T[v_0][u]
+
+    
+    for i in range(1, n + 1):   # |U| = i
+        for U in itertools.combinations(all_nodes, i):
+            U = set(U)
+            print('U: ', U)
+            V_minus_U = all_nodes - U
+            # all subsets T of V\U (including empty)
+            for r in range(0, len(V_minus_U) + 1):
+                for T in itertools.combinations(V_minus_U, r):
+                    T = set(T)
+                    print('T: ', T)
+                    for u in U:
+                        for w in all_nodes:
+                            print('u: ', u, 'w: ', w)
+                            prev_cost = D[(frozenset(U), u)]
+                            if prev_cost == math.inf:
+                                continue
+                            op_cost = D_OP.get((frozenset(T | {w}), u, w), math.inf)
+                            z = prev_cost + op_cost
+                            newS = frozenset(U | {u, w} | T)
+                            print('S: ', newS)
+                            if z < D[(newS, w)]:
+                                D[(newS, w)] = z
+                                print('Update D[S] = ', z)
+    print('\nD: ', D)
 
 
     # Close the tour: return to start
