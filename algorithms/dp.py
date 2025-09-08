@@ -37,13 +37,8 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
     n = numnodes
 
     D_T = {}
-    P = {}
+    # P = {}
 
-    all_sets = []
-    for s in range(2, n + 1):
-        for subset in itertools.combinations(range(n), s):  # all possible subsets of size i from the set range(n)
-            sset = frozenset(subset)
-            all_sets.append(sset)
     all_nodes = frozenset(range(n))
 
 
@@ -56,60 +51,79 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
 
             D_T[(frozenset([v, w]), v, w)] = delta_T[v][w]
             D_T[(frozenset([v, w]), w, v)] = delta_T[v][w]
-            P[(frozenset([v, w]), v, w)] = v
-            P[(frozenset([v, w]), w, v)] = w
+            # P[(frozenset([v, w]), v, w)] = v
+            # P[(frozenset([v, w]), w, v)] = w
 
-    for S in all_sets:
-        print('Subset: ', S)
-        for v in S:             # Note: v and w has to be in S
-            for w in S:
-                print('v = ',v, 'w = ', w)
-                if v == w:
-                    continue
-                # compute best path v→...→w covering S
-                best_cost, best_prev = float("inf"), None
-                for u in S:
-                    print('u = ', u)
-                    if u == w or u==v:
+    for s in range(2, n + 1):
+        for subset in itertools.combinations(range(n), s):  # all possible subsets of size i from the set range(n)
+            S = frozenset(subset)
+            # print('Subset: ', S)
+            for v in S:             # Note: v and w has to be in S
+                for w in S:
+                    # print('v = ',v, 'w = ', w)
+                    if v == w:
                         continue
-                    if (S - {w}, v, u) not in D_T:
-                        continue
-                    cost = D_T[(S - {w}, v, u)] + delta_T[u][w]
-                    print('cost = ', cost)
-                    if cost < best_cost:
-                        best_cost, best_prev = cost, u
-                if best_cost < float("inf"):
-                    D_T[(S, v, w)] = best_cost
-                    P[(S, v, w)] = best_prev
+                    # compute best path v→...→w covering S
+                    best_cost, best_prev = float("inf"), None
+                    for u in S:
+                        # print('u = ', u)
+                        if u == w or u==v:
+                            continue
+                        if (S - {w}, v, u) not in D_T:
+                            continue
+                        cost = D_T[(S - {w}, v, u)] + delta_T[u][w]
+                        # print('cost = ', cost)
+                        if cost < best_cost:
+                            best_cost, best_prev = cost, u
+                    if best_cost < float("inf"):
+                        D_T[(S, v, w)] = best_cost
+                        # P[(S, v, w)] = best_prev
 
     print('\nD_T: ', D_T)
-    print('\nP: ', P)
+    # print('\nP: ', P)
 
 
 
     ### SECOND PASS
     D_OP = {}
-    for subset in all_sets:
-        # print('subset: ', subset)
-        for v in subset:
-            for w in subset:
-                if v == w:
-                    continue
-                best = D_T[(S, v, w)]
-                for d in S - {v, w}:
-                    truck_time = D_T[(S - {d}, v, w)]
-                    drone_time = delta_D[v][d] + delta_D[d][w]
-                    total_time = max(truck_time, drone_time)
-                    best = min(best, total_time)
-                D_OP[(S, v, w)] = best
+    P_D = {}    # which node should be assigned for drone in (S,v,w)
+    for s in range(1, n+1):
+        for subset in itertools.combinations(range(n), s):  # all possible subsets of size i from the set range(n)
+            subset = frozenset(subset)
+            # print('subset: ', subset)
+
+            if len(subset) == 1:
+                v = next(iter(subset)) 
+                D_OP[(subset, v, v)] = 0
+                continue
+
+            for v in subset:
+                for w in subset:
+                    if v == w:
+                        continue
+                    best = D_T[(subset, v, w)]
+                    best_d = 0
+                    for d in subset - {v, w}:   # for every node drone can take
+                        truck_time = D_T[(subset - {d}, v, w)]
+                        drone_time = delta_D[v][d] + delta_D[d][w]
+                        total_time = max(truck_time, drone_time)
+                        if total_time < best:
+                            best = total_time
+                            best_d = d
+                    D_OP[(subset, v, w)] = best
+                    if best_d != 0:
+                        P_D[(subset, v, w)] = best_d
 
     print('\nD_OP: ', D_OP)
+    print('\nP_D: ', P_D)
 
 
 
     ### THIRD PASS
     v_0 = 0     # defining depot
     D = defaultdict(lambda: math.inf)
+    P_T = {}
+    P_OP = {}
 
     # base case
     D[(frozenset(), v_0)] = 0   # base case
@@ -120,33 +134,42 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
     for i in range(1, n + 1):   # |U| = i
         for U in itertools.combinations(all_nodes, i):
             U = set(U)
-            print('U: ', U)
+            # print('U: ', U)
             V_minus_U = all_nodes - U
             # all subsets T of V\U (including empty)
             for r in range(0, len(V_minus_U) + 1):
                 for T in itertools.combinations(V_minus_U, r):
                     T = set(T)
-                    print('T: ', T)
+                    # print('T: ', T)
                     for u in U:
                         for w in all_nodes:
-                            print('u: ', u, 'w: ', w)
+                            # print('u: ', u, 'w: ', w)
                             prev_cost = D[(frozenset(U), u)]
                             if prev_cost == math.inf:
                                 continue
-                            op_cost = D_OP.get((frozenset(T | {w}), u, w), math.inf)
+                            op_cost = D_OP.get((frozenset(T | {u}), u, w), math.inf)
                             z = prev_cost + op_cost
                             newS = frozenset(U | {u, w} | T)
-                            print('S: ', newS)
+                            # print('S: ', newS, '\tDrone_op set: ', T | {w}, '\tz = ', z, '\tD[S,w] = ', D[(newS, w)])
                             if z < D[(newS, w)]:
                                 D[(newS, w)] = z
-                                print('Update D[S] = ', z)
+                                # TODO: Buidling the parenthesis for both truck and drone
+                                drone_nodes = P_D.get((frozenset(T | {u}), u, w), None)
+                                if drone_nodes == None:
+                                    P_T[(newS, w)] = u
+                                    P_OP[(newS, u, w)] = None
+                                else:
+                                    P_T[(newS, w)] = frozenset(T - {u, w, drone_nodes})
+                                    P_OP[(newS, u, w)] = frozenset([w, drone_nodes, u])
     print('\nD: ', D)
+    print('\nP_T: ', P_T)
+    print('\nP_OP: ', P_OP)
 
 
     # Close the tour: return to start
     start = 0
     best_cost, last = min(
-        (D_T[(all_nodes, start, w)] + delta_T[w][start], w)
+        (D[(all_nodes, w)] + delta_T[w][start], w)
         for w in range(n) if w != start
     )
     
@@ -157,7 +180,7 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
     # print('path: ', path, 'S: ', S)
     while True:
         path.append(w)
-        u = P.get((S, start, w), None)
+        u = P_T.get((S, w), None)
         # print('u: ', u, 'w: ', w)
         if u is None:
             break
