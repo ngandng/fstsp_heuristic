@@ -79,7 +79,7 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
                         D_T[(S, v, w)] = best_cost
                         # P[(S, v, w)] = best_prev
 
-    print('\nD_T: ', D_T)
+    # print('\nD_T: ', D_T)
     # print('\nP: ', P)
 
 
@@ -117,16 +117,16 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
                     if best_d != 0:
                         P_D[(subset, v, w)] = best_d
 
-    print('\nD_OP: ', D_OP)
-    print('\nP_D: ', P_D)
+    # print('\nD_OP: ', D_OP)
+    # print('\nP_D: ', P_D)
 
 
 
     ### THIRD PASS
     v_0 = 0     # defining depot
     D = defaultdict(lambda: math.inf)
-    P_T = {}
-    P_OP = {}
+    P_T = {}    # which node will be in the next sub_routes
+    P_OP = {}   # nodes can be assigned for truck in this sub-routes
 
     # base case
     D[(frozenset(), v_0)] = 0   # base case
@@ -137,13 +137,13 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
     for i in range(1, n + 1):   # |U| = i
         for U in itertools.combinations(all_nodes, i):
             U = set(U)
-            print('U: ', U)
+            # print('U: ', U)
             V_minus_U = all_nodes - U
             # all subsets T of V\U (including empty)
             for r in range(0, len(V_minus_U) + 1):
                 for T in itertools.combinations(V_minus_U, r):
                     T = set(T)
-                    print('T: ', T)
+                    # print('T: ', T)
                     for u in U:
                         for w in all_nodes:
                             # print('u: ', u, 'w: ', w)
@@ -153,18 +153,17 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
                             op_cost = D_OP.get((frozenset(T | {u}), u, w), math.inf)
                             z = prev_cost + op_cost
                             newS = frozenset(U | {u, w} | T)
-                            print('S: ', newS, '\tDrone_op set: ', T | {u}, '\t(u,w)=',u,w, '\tz = ', z, '\tD[S,w] = ', D[(newS, w)])
+                            # print('S: ', newS, '\tDrone_op set: ', T | {u}, '\t(u,w)=',u,w, '\tz = ', z, '\tD[S,w] = ', D[(newS, w)])
                             if z < D[(newS, w)]:
-                                print("Updated D[{%s},%d] = %d" % (newS, w, z))
+                                # print("Updated D[{%s},%d] = %d" % (newS, w, z))
                                 D[(newS, w)] = z
-                                # TODO: Buidling the parenthesis for both truck and drone
                                 drone_nodes = P_D.get((frozenset(T | {u}), u, w), None)
                                 P_T[(newS, w)] = u
                                 if drone_nodes != None:
                                     P_OP[(newS, w)] = frozenset(T - {w, drone_nodes})
-    print('\nD: ', D)
-    print('\nP_T: ', P_T)
-    print('\nP_OP: ', P_OP)
+    # print('\nD: ', D)
+    # print('\nP_T: ', P_T)
+    # print('\nP_OP: ', P_OP)
 
 
     # Close the tour: return to start
@@ -185,7 +184,7 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
         path_truck.append(w)
         u = P_T.get((S, w), None)
         u_op = P_D.get((S, u, w), None)
-        print('S: ', S, 'w: ', w, 'u: ', u, 'u_op: ', u_op)
+        # print('S: ', S, 'w: ', w, 'u: ', u, 'u_op: ', u_op)
         if u is None:
             break
         if u_op:
@@ -201,11 +200,11 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
             break
     path_truck.append(start)
 
-    print("\n\nTruck path:", path_truck)
-    print("Drone path: ", path_drone)
-    print("Minimum cost:", best_cost)
+    # print("\n\nTruck path:", path_truck)
+    # print("Drone path: ", path_drone)
+    # print("Minimum cost:", best_cost)
     
-    return path_truck, best_cost
+    return path_truck, None, path_drone, best_cost
 
 
 # Testing

@@ -9,6 +9,7 @@ import pandas as pd
 from algorithms.fstsp_heuristic import fstsp_heuristic
 from algorithms.cp_aco import cp_aco
 from algorithms.tsp import solveTSP
+from algorithms.dp import dp_tspd
 
 
 from utils import process_location_data
@@ -41,15 +42,21 @@ if __name__ == "__main__":
     # city_name = 'Incheon_small'
     # city_name = 'Incheon_big'
     city_name = "Ulsan_Namgu"
-    num_nodes = 101
+    num_nodes = 9
     folder_name = 'data/new_test/' + str(city_name) +'/' + str(num_nodes) + '/'
     problem_names = [f.name for f in os.scandir(folder_name) if f.is_dir()]
-
     problem_name = folder_name + problem_names[0]
-    total_test_episodes = min(len(problem_names), 1000)
+    total_test_episodes = min(len(problem_names), 2)
+
+    # folder_name = 'my_test'
+    # city_name = 'my_test'
+    # total_test_episodes = 1
 
     for ep in range(total_test_episodes):
-        testproblem = folder_name + problem_names[ep]
+        if total_test_episodes == 1:
+            testproblem = folder_name
+        else:
+            testproblem = folder_name + problem_names[ep]
 
         locations, num_nodes, parcel_weight, delta_T, delta_D = process_location_data(testproblem)
 
@@ -71,6 +78,8 @@ if __name__ == "__main__":
         elif args.algorithm == 'tsp':
             truck_route, time_array, timespan = solveTSP(delta_T)
             drone_routes = []
+        elif args.algorithm == 'dp':
+            truck_route, time_array, drone_routes, timespan = dp_tspd(num_nodes, parcel_weight, delta_T, delta_D)
 
         end_time = time.time()
         ep_time.append((end_time-start_time))
