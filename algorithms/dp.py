@@ -127,6 +127,7 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
     D = defaultdict(lambda: math.inf)
     P_T = {}    # which node will be in the next sub_routes
     P_OP = {}   # nodes can be assigned for truck in this sub-routes
+    P_OPD = {}  # nodes will be assigned for drone in this sub_routes
 
     # base case
     D[(frozenset(), v_0)] = 0   # base case
@@ -146,7 +147,6 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
                     # print('T: ', T)
                     for u in U:
                         for w in all_nodes:
-                            # print('u: ', u, 'w: ', w)
                             prev_cost = D[(frozenset(U), u)]
                             if prev_cost == math.inf:
                                 continue
@@ -156,11 +156,14 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
                             # print('S: ', newS, '\tDrone_op set: ', T | {u}, '\t(u,w)=',u,w, '\tz = ', z, '\tD[S,w] = ', D[(newS, w)])
                             if z < D[(newS, w)]:
                                 # print("Updated D[{%s},%d] = %d" % (newS, w, z))
+                                # print('U: ', U, 'T: ', T)
+                                # print('S: ', newS, '\tDrone_op set: ', T | {u}, '\t(u,w)=',u,w, '\tz = ', z, '\tD[S,w] = ', D[(newS, w)])
                                 D[(newS, w)] = z
                                 drone_nodes = P_D.get((frozenset(T | {u}), u, w), None)
                                 P_T[(newS, w)] = u
                                 if drone_nodes != None:
                                     P_OP[(newS, w)] = frozenset(T - {w, drone_nodes})
+                                    P_OPD[(newS, w)] = drone_nodes
     # print('\nD: ', D)
     # print('\nP_T: ', P_T)
     # print('\nP_OP: ', P_OP)
@@ -183,8 +186,9 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
     while True:
         path_truck.append(w)
         u = P_T.get((S, w), None)
-        u_op = P_D.get((S, u, w), None)
-        # print('S: ', S, 'w: ', w, 'u: ', u, 'u_op: ', u_op)
+        u_op = P_OPD.get((S, w), None)
+        # print('Truck: ', path_truck, '\nDrone: ', path_drone)
+        # print('S: ', S, 'w: ', w, 'u: ', u, 'u_op: ', u_op, '\n')
         if u is None:
             break
         if u_op:
@@ -197,12 +201,10 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
         # print('path: ', path, 'S: ', S)
         w = u
         if w == start:
+            # print('Truck: ', path_truck, '\nDrone: ', path_drone)
+            # print('S: ', S, 'w: ', w, 'u: ', u, 'u_op: ', u_op, '\n')
             break
     path_truck.append(start)
-
-    # print("\n\nTruck path:", path_truck)
-    # print("Drone path: ", path_drone)
-    # print("Minimum cost:", best_cost)
     
     return path_truck, None, path_drone, best_cost
 
@@ -210,20 +212,42 @@ def dp_tspd(numnodes, parcel_weight, delta_T, delta_D):
 # Testing
 if __name__ == "__main__":
     # Example cost matrix (symmetric)
+    # cost_matrix = [
+    #     [0, 10, 15, 20],
+    #     [10, 0, 35, 25],
+    #     [15, 35, 0, 30],
+    #     [20, 25, 30, 0]
+    # ]
+    # drone_matrix = [
+    #     [0, 5, 8, 10],
+    #     [5, 0, 18, 12],
+    #     [8, 18, 0, 15],
+    #     [10, 12, 15, 0]
+    # ]
+
     cost_matrix = [
-        [0, 10, 15, 20],
-        [10, 0, 35, 25],
-        [15, 35, 0, 30],
-        [20, 25, 30, 0]
+        [0, 10, 15, 20, 25, 30],
+        [10, 0, 35, 25, 17, 28],
+        [15, 35, 0, 30, 22, 26],
+        [20, 25, 30, 0, 24, 18],
+        [25, 17, 22, 24, 0, 16],
+        [30, 28, 26, 18, 16, 0]
     ]
     drone_matrix = [
-        [0, 5, 8, 10],
-        [5, 0, 18, 12],
-        [8, 18, 0, 15],
-        [10, 12, 15, 0]
+        [0, 5, 8, 10, 12, 14],
+        [5, 0, 18, 12, 10, 11],
+        [8, 18, 0, 15, 9, 13],
+        [10, 12, 15, 0, 11, 7],
+        [12, 10, 9, 11, 0, 6],
+        [14, 11, 13, 7, 6, 0]
     ]
+
     start_location = 0
     locations = list(range(len(cost_matrix)))
-    numnodes = 4
-    path, min_cost = dp_tspd(numnodes, None, cost_matrix, drone_matrix)
+    numnodes = 6
+    path_truck, _, path_drone, best_cost = dp_tspd(numnodes, None, cost_matrix, drone_matrix)
+
+    print("\n\nTruck path:", path_truck)
+    print("Drone path: ", path_drone)
+    print("Minimum cost:", best_cost)
     

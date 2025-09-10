@@ -13,7 +13,7 @@ from algorithms.dp import dp_tspd
 
 
 from utils import process_location_data
-# from plot import plot_map
+from plot import plot_map
 
 if __name__ == "__main__":
 
@@ -41,16 +41,17 @@ if __name__ == "__main__":
     # ===> TEST WITH A FOLDER
     # city_name = 'Incheon_small'
     # city_name = 'Incheon_big'
-    city_name = "Ulsan_Namgu"
-    num_nodes = 9
-    folder_name = 'data/new_test/' + str(city_name) +'/' + str(num_nodes) + '/'
-    problem_names = [f.name for f in os.scandir(folder_name) if f.is_dir()]
-    problem_name = folder_name + problem_names[0]
-    total_test_episodes = min(len(problem_names), 2)
+    # city_name = "Ulsan_Namgu"
+    # num_nodes = 26
+    # folder_name = 'data/new_test/' + str(city_name) +'/' + str(num_nodes) + '/'
+    # problem_names = [f.name for f in os.scandir(folder_name) if f.is_dir()]
+    # problem_name = folder_name + problem_names[0]
+    # total_test_episodes = min(len(problem_names), 1000)
 
-    # folder_name = 'my_test'
-    # city_name = 'my_test'
-    # total_test_episodes = 1
+    # ===> TEST WITH SAMPLE DATA
+    folder_name = 'my_test'
+    city_name = 'my_test'
+    total_test_episodes = 1
 
     for ep in range(total_test_episodes):
         if total_test_episodes == 1:
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     print("============================================================================================")
 
     # Plot
-    # plot_map(locations, truck_route, drone_routes)
+    plot_map(locations, truck_route, drone_routes)
 
     # Saving datas
     # Convert to DataFrame for CSV export

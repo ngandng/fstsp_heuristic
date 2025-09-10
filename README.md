@@ -10,18 +10,18 @@ This repository is my implementation of several algorithms solving the truck-dro
 
 - CP-ACO implemented based on the proposed heuristic on *[D. N. Das, R. Sewani, J. Wang and M. K. Tiwari, "Synchronized Truck and Drone Routing in Package Delivery Logistics," in IEEE Transactions on Intelligent Transportation Systems. 2021](https://doi.org/10.1109/TITS.2020.2992549)*
 
-- [Implementing] Dynamic Programming proposed on *[Bouman, Paul, Niels Agatz, and Marie Schmidt. "Dynamic programming approaches for the traveling salesman problem with drone." Networks 72.4 (2018)](https://doi.org/10.1002%2Fnet.21864)*
+- Dynamic Programming proposed on *[Bouman, Paul, Niels Agatz, and Marie Schmidt. "Dynamic programming approaches for the traveling salesman problem with drone." Networks 72.4 (2018)](https://doi.org/10.1002%2Fnet.21864)*
 
 ## How to Run
 
 ```bash
-python3 main.py --algorithm="algorithm_name" --test_instance="test_folder_name"
+python3 main.py --algorithm="algorithm_name"
 ```
-where `algorithm_name` can be either 'fstsp_heuristic' or 'cp_aco'
+Check `main.py` for the list of algorithm name
 
 ### Configuration
 
-- Algorithm parameters can be adjusted in the `algorithm_name.py` file.
+- Algorithm parameters can be adjusted in the `config.yaml` file.
 
 
 ## Test Cases
@@ -48,6 +48,10 @@ where `algorithm_name` can be either 'fstsp_heuristic' or 'cp_aco'
       <img src="imgs/cp_aco_25cus.png" width="250"/><br>
       <em>Figure 2: Results of CP-ACO in 25 customers test</em>
     </td>
+    <td align="center">
+      <img src="imgs/dp_9nodes.png" width="250"/><br>
+      <em>Figure 4: Results of dynamic programming in 8 customers test</em>
+    </td>
   </tr>
 </table>
 
@@ -62,4 +66,4 @@ where `algorithm_name` can be either 'fstsp_heuristic' or 'cp_aco'
 - `ortools`
 
 ## Author
-Thi Thuy Ngan Duong
+👩🏻‍💻 Thi Thuy Ngan Duong
