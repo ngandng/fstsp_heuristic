@@ -1,4 +1,4 @@
-# The Flying Sidekick Traveling Salesman Problem (FSTSP)
+# The truck and drone delivery problem (FSTSP, TSP-D)
 
 This repository is my implementation of several algorithms solving the truck-drone delivery problem:
 
